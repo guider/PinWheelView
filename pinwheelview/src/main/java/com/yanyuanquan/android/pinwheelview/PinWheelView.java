@@ -5,6 +5,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -15,9 +19,12 @@ import android.view.View;
 import java.util.List;
 
 
-public class PinWheelView extends View {
+public class PinWheelView extends View implements SensorEventListener {
 
     private float r = 0;
+
+    private Sensor sensor;
+    private SensorManager manager;
 
     public PinWheelView(Context context) {
         this(context, null);
@@ -32,22 +39,51 @@ public class PinWheelView extends View {
         init();
     }
 
-    Handler handler  = new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            r  +=5;
             invalidate();
-            handler.sendEmptyMessageDelayed(1,2);
+            handler.sendEmptyMessageDelayed(1, 2);
+            if (r>3)
+                r -= r*0.007;
+            Log.e("zjw", " r -->>  " + r);
         }
     };
+
     private void init() {
-        handler.sendEmptyMessageDelayed(1,20);
+        handler.sendEmptyMessageDelayed(1, 20);
+
+        manager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+        sensor = manager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        Log.e("zjw", event.values[0] + " ");
+        Log.e("zjw", event.values[1] + " ");
+        Log.e("zjw", event.values[2] + " ");
+
+        int t = (int)(Math.pow(((int) (event.values[0])), 2) + Math.pow(((int) (event.values[1])), 2) + Math.pow(((int) (event.values[2])), 2));
+        Log.e("zjw", " t " + t);
+        if (t>50)
+            r += t;
+
+    }
+
+    
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.rotate(r%360,getWidth()/2,getHeight()/2);
+        if (r > 0)
+            canvas.rotate(r % 360, getWidth() / 2, getHeight() / 2);
         canvas.save();
         drawLeaf(canvas);
         canvas.restore();
