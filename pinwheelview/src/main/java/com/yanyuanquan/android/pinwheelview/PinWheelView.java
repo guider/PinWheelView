@@ -62,18 +62,11 @@ public class PinWheelView extends View implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Log.e("zjw", event.values[0] + " ");
-        Log.e("zjw", event.values[1] + " ");
-        Log.e("zjw", event.values[2] + " ");
-
         int t = (int)(Math.pow(((int) (event.values[0])), 2) + Math.pow(((int) (event.values[1])), 2) + Math.pow(((int) (event.values[2])), 2));
         Log.e("zjw", " t " + t);
         if (t>50)
             r += t;
-
     }
-
-    
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
