@@ -46,8 +46,7 @@ public class PinWheelView extends View implements SensorEventListener {
             invalidate();
             handler.sendEmptyMessageDelayed(1, 2);
             if (r>3)
-                r -= r*0.007;
-            Log.e("zjw", " r -->>  " + r);
+                r -= r*0.005;
         }
     };
 
@@ -63,14 +62,18 @@ public class PinWheelView extends View implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         int t = (int)(Math.pow(((int) (event.values[0])), 2) + Math.pow(((int) (event.values[1])), 2) + Math.pow(((int) (event.values[2])), 2));
-        Log.e("zjw", " t " + t);
-        if (t>50)
+        if (t>100)
             r += t;
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override
@@ -125,6 +128,10 @@ public class PinWheelView extends View implements SensorEventListener {
 
         paint.setColor(Color.GREEN);
         canvas.drawPath(path4, paint);
+
+        paint.setColor(Color.parseColor("#ffc4c4c4"));
+        canvas.drawCircle(0,0,40,paint);
+
     }
 
 
